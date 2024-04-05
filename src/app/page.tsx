@@ -6,13 +6,24 @@ export default function Home() {
   const [pairs, setPairs] = useState<Entry[]>([]);
 
   const generatePairs = (entries: Entry[]) => {
-    let shuffledThemes = entries.map((entry) => entry.theme);
-    shuffledThemes.sort(() => 0.5 - Math.random());
-
-    const newPairs = entries.map((entry, index) => ({
-      name: entry.name,
-      theme: shuffledThemes[index],
-    }));
+    let themes = entries.map(entry => entry.theme).sort(() => Math.random() - 0.5);
+    const usedThemes = new Set<string>(); // 使用済みテーマを追跡
+    const newPairs: Entry[] = entries.map(entry => {
+      let theme: string | undefined;
+      // まだ使用されていないテーマを探す
+      for (const t of themes) {
+        if (!usedThemes.has(t)) {
+          theme = t;
+          usedThemes.add(t); // テーマを使用済みとしてマーク
+          break;
+        }
+      }
+      if (theme === undefined) {
+        // すべてのテーマが使用されてしまった場合のエラーハンドリング
+        throw new Error("不足しているテーマがあります");
+      }
+      return { name: entry.name, theme: theme };
+    });
 
     setPairs(newPairs);
   };
