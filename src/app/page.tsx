@@ -5,10 +5,20 @@ import IntroductionForm, { Entry } from "./components/form";
 export default function Home() {
   const [pairs, setPairs] = useState<Entry[]>([]);
 
+  // シャッフル関数の定義
+  const shuffle = <T,>(array: T[]): T[] => {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  };
+
   const generatePairs = (entries: Entry[]) => {
-    let themes = entries.map(entry => entry.theme).sort(() => Math.random() - 0.5);
+    // 名前とテーマのリストをシャッフル
+    let shuffledEntries = shuffle(entries);
+    let themes = shuffle(entries.map(entry => entry.theme));
     const usedThemes = new Set<string>(); // 使用済みテーマを追跡
-    const newPairs: Entry[] = entries.map(entry => {
+    const newPairs: Entry[] = shuffledEntries.map(entry => {
       let theme: string | undefined;
       // まだ使用されていないテーマを探す
       for (const t of themes) {
